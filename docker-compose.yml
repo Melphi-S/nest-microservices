@@ -1,0 +1,36 @@
+services:
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./auth-service
+    env_file: ./auth-service/.env
+    environment:
+      - HOST=auth-service
+    ports:
+      - "4002:4002"
+    restart: unless-stopped
+
+  gateway:
+    container_name: gateway
+    build:
+      context: ./gateway
+    env_file: ./gateway/.env
+    environment:
+      - AUTH_HOST=auth-service
+      - POSTS_HOST=posts-service
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+
+  posts-service:
+    container_name: posts-service
+    build:
+      context: posts-service
+    env_file: posts-service/.env
+    environment:
+      - HOST=posts-service
+    ports:
+      - "4001:4001"
+    restart: unless-stopped
