@@ -21,14 +21,17 @@ export class AuthService {
     return null;
   }
 
-  login(user: User) {
+  async login(user: User) {
     const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async register(email: string, password: string): Promise<User> {
+  async register(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'>> {
     const oldUser = await this.userRepository.findOne({ where: { email } });
 
     if (oldUser) {
@@ -42,6 +45,11 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
-    return await this.userRepository.save(user);
+    const newUser = await this.userRepository.save(user);
+
+    return {
+      id: newUser.id,
+      email: newUser.email,
+    };
   }
 }

@@ -6,9 +6,8 @@ import { MessagePattern } from '@nestjs/microservices';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @MessagePattern({ cmd: 'getPosts' })
+  @MessagePattern('getPosts')
   async getPosts() {
-    const posts = await this.postsService.getPosts();
-    return posts;
+    return await this.postsService.getPosts();
   }
 }

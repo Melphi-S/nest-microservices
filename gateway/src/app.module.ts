@@ -13,18 +13,28 @@ import { getJwtConfig } from './configs/jwt.config';
     ClientsModule.register([
       {
         name: 'AUTH',
-        transport: Transport.TCP,
+        transport: Transport.KAFKA,
         options: {
-          host: process.env.AUTH_HOST || 'localhost',
-          port: parseInt(process.env.AUTH_PORT || '4002'),
+          client: {
+            clientId: 'auth',
+            brokers: [process.env.KAFKA_BROKER || `localhost:9092`],
+          },
+          consumer: {
+            groupId: 'auth-consumer',
+          },
         },
       },
       {
         name: 'POSTS',
-        transport: Transport.TCP,
+        transport: Transport.KAFKA,
         options: {
-          host: process.env.POSTS_HOST || 'localhost',
-          port: parseInt(process.env.POSTS_PORT || '4001'),
+          client: {
+            clientId: 'posts',
+            brokers: [process.env.KAFKA_BROKER || `localhost:9092`],
+          },
+          consumer: {
+            groupId: 'posts-consumer',
+          },
         },
       },
     ]),

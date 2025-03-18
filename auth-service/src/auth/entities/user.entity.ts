@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { IsEmail, MinLength } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -12,5 +13,6 @@ export class User {
 
   @Column()
   @MinLength(8)
+  @Exclude()
   password: string;
 }
