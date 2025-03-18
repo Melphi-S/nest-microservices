@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcryptjs';
 import { User } from './entities/user.entity';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -28,13 +29,17 @@ export class AuthService {
     };
   }
 
-  async register(email: string, password: string): Promise<User> {
+  async register(
+    email: string,
+    password: string,
+  ): Promise<Omit<User, 'password'>> {
     const oldUser = await this.userRepository.findOne({ where: { email } });
 
     if (oldUser) {
-      throw new BadRequestException(
-        'Пользователь с данный email уже зарегистрирован',
-      );
+      throw new RpcException({
+        statusCode: 400,
+        message: 'Пользователь с данным email уже зарегистрирован',
+      });
     }
 
     const hashedPassword = await hash(password, 10);
@@ -42,6 +47,10 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
-    return await this.userRepository.save(user);
+    const newUser = await this.userRepository.save(user);
+    return {
+      id: newUser.id,
+      email: newUser.email,
+    };
   }
 }

@@ -7,23 +7,23 @@ import { JwtGuard } from './guards/jwt.guard';
 @Controller()
 export class AppController {
   constructor(
-    @Inject('AUTH') private readonly auth: ClientProxy,
-    @Inject('POSTS') private readonly posts: ClientProxy,
+    @Inject('AUTH') private readonly authClient: ClientProxy,
+    @Inject('POSTS') private readonly postsClient: ClientProxy,
   ) {}
 
   @Post('register')
   register(@Body() body: AuthDto): Observable<any> {
-    return this.auth.send({ cmd: 'register' }, body);
+    return this.authClient.send({ cmd: 'register' }, body);
   }
 
   @Post('login')
-  login(@Body() body: AuthDto): Observable<any> {
-    return this.auth.send({ cmd: 'login' }, body);
+  login(@Body() body: AuthDto): Observable<any> | undefined {
+    return this.authClient.send({ cmd: 'login' }, body);
   }
 
   @UseGuards(JwtGuard)
   @Get('posts')
   getPosts(): Observable<any> {
-    return this.posts.send({ cmd: 'getPosts' }, {});
+    return this.postsClient.send({ cmd: 'getPosts' }, {});
   }
 }
